@@ -1,5 +1,7 @@
-import fisica as fis
-from ciencia import matematica as mat
+from ciencia import fisica
+from ciencia import matematica
+
+
 
 
 if __name__ == '__main__':
