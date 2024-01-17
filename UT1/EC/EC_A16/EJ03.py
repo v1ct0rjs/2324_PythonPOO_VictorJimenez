@@ -120,11 +120,9 @@ class Empresa:
         self._clientes = []
         return self._clientes
 
-    @agregarEmpleado.setter
     def agregarEmpleado(self, empleado: object):
         self._empleados.append(empleado)
 
-    @agregarCliente.setter
     def agregarCliente(self, cliente: object):
         self._clientes.append(cliente)
 
