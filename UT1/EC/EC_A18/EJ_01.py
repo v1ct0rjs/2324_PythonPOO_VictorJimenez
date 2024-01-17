@@ -42,5 +42,6 @@ def main():
 
     print(f'El dia {diaEnum.name} no es laborable')
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
+    main()
