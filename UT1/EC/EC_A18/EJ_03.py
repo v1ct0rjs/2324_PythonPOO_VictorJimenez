@@ -37,21 +37,37 @@ class UserAuth:
         self.__acceso.modules = NivelAccesoEnum.TOTAL
 
     def assign_module_access(self, module: ModuloEnum, nivel_acceso: NivelAccesoEnum):
-        self.__acceso.module = NivelAccesoEnum.nivel_acceso
-        pass
+        self.__acceso.module = nivel_acceso
 
     def unassing_module_access(self, module: ModuloEnum):
-        # Completa este método
-        pass
+        self.__acceso.module = NivelAccesoEnum.SIN_ACCESO
 
     def reset_module_access(self):
-        # Completa este método
-        pass
+        self.__acceso = {}
 
     def is_module_access(self, module: ModuloEnum) -> bool:
-        # Completa este método
-        pass
+        return module in self.__acceso
 
     def has_module_access(self, module: ModuloEnum, nivel_acceso: NivelAccesoEnum) -> bool:
-        # Completa este método. True si el usuario tiene acceso al módulo con el nivel de acceso indicado, False en caso contrario
-        pass
+        return self.__acceso.get(module) == nivel_acceso
+
+if __name__ == '__main__':
+
+    user1 = UserAuth("Juan", "juanin")
+    user1.assing_all_module_access([(ModuloEnum.VENTAS, NivelAccesoEnum.NORMAL), (ModuloEnum.COMPRAS, NivelAccesoEnum.RESTRINGIDO)])
+    assert user1.is_module_access(ModuloEnum.VENTAS) == True
+    assert user1.is_module_access(ModuloEnum.COMPRAS) == True
+    assert user1.is_module_access(ModuloEnum.ALMACEN) == False
+
+    user1.unassing_module_access(ModuloEnum.VENTAS)
+    assert user1.is_module_access(ModuloEnum.VENTAS) == False
+
+    user1.reset_module_access()
+    assert user1.is_module_access(ModuloEnum.VENTAS) == False
+    assert user1.is_module_access(ModuloEnum.COMPRAS) == False
+
+    user1.assign_module_access(ModuloEnum.COMPRAS, NivelAccesoEnum.TOTAL)
+    user1.assign_module_access(ModuloEnum.VENTAS, NivelAccesoEnum.NORMAL)
+    assert user1.has_module_access(ModuloEnum.VENTAS, NivelAccesoEnum.NORMAL) == True
+    assert user1.has_module_access(ModuloEnum.VENTAS, NivelAccesoEnum.RESTRINGIDO) == False
+    assert user1.has_module_access(ModuloEnum.COMPRAS, NivelAccesoEnum.NORMAL) == False
