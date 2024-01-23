@@ -30,7 +30,7 @@ class UserAuth:
 
     def get_module_access_level(self, module: ModuloEnum) -> NivelAccesoEnum:
         if self.__acceso.module >= ModuloEnum:
-            return module.get(self.__acceso)
+            return self.__acceso.get(module)
         return NivelAccesoEnum.SIN_ACCESO
 
     def assing_all_module_access(self, modules: dict[ModuloEnum, NivelAccesoEnum]):
