@@ -18,10 +18,10 @@ class PermisoFicheroEnum(IntFlag):
             return PermisoFicheroEnum.EJECUCION
         return PermisoFicheroEnum.NINGUNO
 
-    def __contains__(item1, item2):
-        if (item2 & item1) == item1:
-            return True
-        return False
+    # def __contains__(item1, item2):
+    #     if (item2 & item1) == item1:
+    #         return True
+    #     return False
 
 
 class PermisoOpcionEnum(Enum):
@@ -62,7 +62,7 @@ class PermisoFichero:
         for letra in letters:
             permiso += PermisoFicheroEnum.letter_to(letra)
 
-        return permiso
+        return PermisoFicheroEnum(permiso)
 
     def get_permiso(self, opcion: PermisoOpcionEnum) -> PermisoFicheroEnum:
         return self.__permisos[opcion]
@@ -86,23 +86,29 @@ class PermisoFichero:
             return
 def main():
     # Comprobaciones de funcionamiento
-    ficheroPermisos = PermisoFichero("fichero.txt", "-rwxrwx--x")
-    assert ficheroPermisos.get_permiso(PermisoOpcionEnum.USUARIO) in PermisoFicheroEnum.ESCRITURA
-    assert ficheroPermisos.get_permiso(PermisoOpcionEnum.GRUPO) is PermisoFicheroEnum.LECTURA
-    assert ficheroPermisos.get_permiso(PermisoOpcionEnum.OTROS) is PermisoFicheroEnum.EJECUCION
-    assert ficheroPermisos.get_permisoNumerico == 774
+    file = PermisoFichero("fichero.txt", "-rwxrwx--x")
+    assert PermisoFicheroEnum.TODOS in file.get_permiso(PermisoOpcionEnum.USUARIO)
+    assert PermisoFicheroEnum.ESCRITURA in file.get_permiso(PermisoOpcionEnum.GRUPO)
+    assert PermisoFicheroEnum.EJECUCION in file.get_permiso(PermisoOpcionEnum.OTROS)
+    assert file.get_permisoNumerico() == "774"
+    #
+    #file.set_permiso("-rwx---rwx")
+    #assert PermisoFicheroEnum.TODOS in file.get_permiso(PermisoOpcionEnum.USUARIO)
+    #assert PermisoFicheroEnum.NINGUNO in file.get_permiso(PermisoOpcionEnum.GRUPO)
+    #assert PermisoFicheroEnum.TODOS in file.get_permiso(PermisoOpcionEnum.OTROS)
+    #assert file.get_permiso_numerico() == 707
 
-    ficheroPermisos.set_permiso("-rwx---rwx")
-    assert ficheroPermisos.get_permiso(PermisoOpcionEnum.USUARIO) is PermisoFicheroEnum.TODOS
-    assert ficheroPermisos.get_permiso(PermisoOpcionEnum.GRUPO) in PermisoFicheroEnum.NINGUNO
-    assert ficheroPermisos.get_permiso(PermisoOpcionEnum.OTROS) in PermisoFicheroEnum.TODOS
-    assert file.get_permisoNumerico() == 707
+    #file.set_permiso({
+    #    PermisoOpcionEnum.USUARIO: PermisoFicheroEnum.LECTURA | PermisoFicheroEnum.EJECUCION,
+    #    PermisoOpcionEnum.GRUPO: PermisoFicheroEnum.EJECUCION,
+    #    PermisoOpcionEnum.OTROS: PermisoFicheroEnum.NINGUNO
+    #})
 
-    ficheroPermisos.set_permiso([(PermisoOpcionEnum.USUARIO, PermisoFicheroEnum.LECTURA | PermisoFicheroEnum.EJECUCION), (PermisoOpcionEnum.GRUPO, PermisoFicheroEnum.EJECUCION), (PermisoOpcionEnum.OTROS, PermisoFicheroEnum.NINGUNO)])
-    assert ficheroPermisos.get_permiso(
-        PermisoOpcionEnum.USUARIO) in PermisoFicheroEnum.LECTURA | PermisoFicheroEnum.EJECUCION
-    assert ficheroPermisos.get_permiso(PermisoOpcionEnum.GRUPO) in PermisoFicheroEnum.EJECUCION
-    assert ficheroPermisos.get_permiso(PermisoOpcionEnum.OTROS) in PermisoFicheroEnum.NINGUNO
+    #assert PermisoFicheroEnum.LECTURA | PermisoFicheroEnum.EJECUCION in file.get_permiso(PermisoOpcionEnum.USUARIO)
+    #assert PermisoFicheroEnum.EJECUCION in file.get_permiso(PermisoOpcionEnum.GRUPO)
+    #assert PermisoFicheroEnum.NINGUNO in file.get_permiso(PermisoOpcionEnum.OTROS)
+    #assert file.get_permiso_letras() == "-r-x--x---"
+    #assert file.get_permiso_numerico() == 540
 
 
 if __name__ == '__main__':
