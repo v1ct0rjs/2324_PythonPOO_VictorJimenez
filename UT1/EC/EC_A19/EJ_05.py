@@ -15,9 +15,9 @@ class InvalidDiscountError(MyappException):
 
 def calcular_descuento(precio_original: int, porcentaje_descuento: int) -> int | None:
     try:
-        if isinstance(precio_original, int):
+        if not isinstance(precio_original, int):
             raise InvalidPriceError("El precio debe ser un número positivo.")
-        if porcentaje_descuento < 0 or porcentaje_descuento > 100:
+        if not (0 <= porcentaje_descuento <= 100):
             raise InvalidDiscountError("El descuento debe estar en el rango de 0 a 100.")
 
         precio_final = precio_original - (precio_original * porcentaje_descuento / 100)
@@ -38,3 +38,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+    
