@@ -1,26 +1,26 @@
-
 class PlayMixin:
     @staticmethod
-    def play(song_name: str):
-        print(f'Playing {song_name}')
+    def play(artis: str, song_name: str):
+        print(f'Playing {artis} - {song_name}')
+
 
 class Song(PlayMixin):
     def __init__(self, title: str, artist: str):
         self.title = title
         self.artist = artist
 
-    def play(self):
-        super().play(self.title)
+    def play(self, **kwargs):
+        super().play(self.artist, self.title)
+
 
 class Playlist(PlayMixin):
-    def __init__(self, name: str, songs: list):
+    def __init__(self, name: str, songs: list[Song]):
         self.name = name
         self.songs = songs
 
-    def play(self):
+    def play(self, **kwargs):
         for song in self.songs:
             song.play()
-
 
 
 song1 = Song("Bohemian Rhapsody", "Queen")
