@@ -1,22 +1,33 @@
-from typing import List
-
 
 class PlayMixin:
-    song_name = None
     @staticmethod
     def play(song_name: str):
-        return f'Playing {song_name}'
+        print(f'Playing {song_name}')
 
-class Song(PlayMixin)
-    def __init__(self, title: str, artist: str, song_name=None):
+class Song(PlayMixin):
+    def __init__(self, title: str, artist: str):
         self.title = title
         self.artist = artist
-        self.song_name = self.title + ' - ' + self.artist
-        super().__init__(song_name)
+
+    def play(self):
+        super().play(self.title)
 
 class Playlist(PlayMixin):
-    def __init__(self, name: str, songs: List, songs_name=None):
+    def __init__(self, name: str, songs: list):
         self.name = name
         self.songs = songs
-        super().__init__(songs_name)
-#
+
+    def play(self):
+        for song in self.songs:
+            song.play()
+
+
+
+song1 = Song("Bohemian Rhapsody", "Queen")
+song1.play()
+
+song2 = Song("Stairway to Heaven", "Led Zeppelin")
+song3 = Song("Hotel California", "The Eagles")
+
+playlist = Playlist("My playlist", [song1, song2, song3])
+playlist.play()
