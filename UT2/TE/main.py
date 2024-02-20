@@ -1,7 +1,8 @@
 from enum import Enum
 import random
 import abc
-#import frases
+import json
+import os
 from frases import frases
 
 
@@ -17,6 +18,7 @@ class Game:
         self.nombre = nombre
         self.tipo = tipo
         self.rondas = rondas.TOTAL_ROUNDS
+        self.players = []
 
     def start(self):
         print("""
@@ -28,16 +30,42 @@ class Game:
         """)
         input('Pulsa ENTER para comenzar el juego')
         self.jugadores = int(input('Indica el número de jugadores (2-4): '))
-        pass
+        for i in range(self.jugadores):
+            nombre = input(f'Nombre del jugador {i+1}: ')
+            tipo = input(f'¿Es un jugador humano? (s/n): ')
+            if tipo == 's':
+                self.players.append(HumanPlayer(nombre, 0, 0))
+            else:
+                self.players.append(ComputerPlayer(nombre, 0, 0))
 
     def showWinner(self):
-        pass
+        winner = None
+        maxPrize = 0
+        for player in self.players:
+            if player.prizeMoney > maxPrize:
+                winner = player
+                maxPrize = player.prizeMoney
+        print(f'El ganador es {winner.name} con {winner.prizeMoney} puntos')
 
-    def loadGame(self):
-        pass
-
-    def saveGame(self):
-        pass
+    # def loadGame(self):
+    #     with open(os.path.expanduser('~/.ruleta_fortuna/savegame.json'), 'r') as file:
+    #         data = json.load(file)
+    #         self.jugadores = data['jugadores']
+    #         self.nombre = data['nombre']
+    #         self.tipo = data['tipo']
+    #         self.rondas = data['rondas']
+    #         self.players = data[HumanPlayer(**player) if player['tipo'] == 's' else ComputerPlayer(**player) for player in data['players']]
+    #
+    # def saveGame(self):
+    #     data = {
+    #         'jugadores': self.jugadores,
+    #         'nombre': self.nombre,
+    #         'tipo': self.tipo,
+    #         'rondas': self.rondas,
+    #         'players': [player.__dict__ for player in self.players]
+    #     }
+    #     with open(os.path.expanduser('~/.ruleta_fortuna/savegame.json'), 'w') as file:
+    #         json.dump(data, file)
 
 
 class Player:
@@ -46,21 +74,21 @@ class Player:
         self.prizeMoney = prizeMoney
         self.priceMoneyRound = priceMoneyRound
 
-    @abc.abstractmethod
+
     def addMoney(self, amt: float):
-        pass
+        self.prizeMoney += amt
 
-    @abc.abstractmethod
+
     def applyBankrupt(self):
-        pass
+        self.priceMoneyRound = 0
 
-    @abc.abstractmethod
-    def addPrizeRouund(self, prize: float):
-        pass
 
-    @abc.abstractmethod
+    def addPrizeRound(self, prize: float):
+        self.prizeMoney += prize
+
+
     def applyWinRound(self):
-        pass
+        self.priceMoneyRound += self.prizeMoney
 
     @abc.abstractmethod
     def goMove(self):
@@ -78,7 +106,15 @@ class HumanPlayer(Player):
         self.priceMoneyRound = priceMoneyRound
 
     def goMove(self):
-        pass
+        tirada = Ruleta.girar()
+        if tirada == -1:
+            self.applyBankrupt()
+            return "Quiebra"
+        elif tirada == 0:
+            return "Pierde turno"
+        else:
+            self.addMoney(tirada)
+            return f'Ha ganado {tirada} €'
 
 class ComputerPlayer(Player):
     def __init__(self, name: str, prizeMoney: float, priceMoneyRound: float):
@@ -99,8 +135,9 @@ class Ruleta():
         return tirada
 
 class RoundGame():
+
     def __init__(self):
-        frases.Phrase.getPhrase()
+
         pass
 
 

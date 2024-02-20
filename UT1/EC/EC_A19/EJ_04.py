@@ -28,6 +28,7 @@ def main():
     es_palindromo("hola")  # El hola no es un palíndromo
     es_palindromo(123)  # Error: Se esperaba una cadena de texto
     es_palindromo("")  # Error: La cadena no puede estar vacía
+    es_palindromo("Roma Amor")
 
 
 if __name__ == '__main__':
