@@ -1,4 +1,7 @@
 from .player import Player
+from .ruleta import Ruleta
+from .roundgame import RoundGame
+import random
 
 
 class ComputerPlayer(Player):
@@ -9,4 +12,22 @@ class ComputerPlayer(Player):
         self.priceMoneyRound = priceMoneyRound
 
     def goMove(self):
-        pass
+        tirada = Ruleta.girar()
+        if tirada == -1:
+            self.applyBankrupt()
+            return "Quiebra"
+        elif tirada == 0:
+            return "Pierde turno"
+        else:
+            self.addMoney(tirada)
+            return f'Ha ganado {tirada} €'
+
+    @staticmethod
+    def consonanteAleatoria():
+        consonantes = random.choice("bcdfghjklmnñpqrstvwxyz")
+        return random.choice(consonantes)
+
+    @staticmethod
+    def compraVocal():
+        vocal = random.choice("aeiou")
+        return vocal
