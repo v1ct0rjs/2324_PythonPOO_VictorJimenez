@@ -1,3 +1,4 @@
+
 from .humanplayer import HumanPlayer
 from .computerplayer import ComputerPlayer
 from .player import Player
@@ -9,6 +10,7 @@ import random
 
 class RoundGame:
 
+
     def __init__(self, players: list[Player], phrase: Phrase):
         self.players = players
         self.phrase = phrase
@@ -18,7 +20,8 @@ class RoundGame:
     def playRound(self):
         for player in self.players:
             if self.playTurn(player):
-                return f'{player.name} ha ganado la ronda'
+                print(f'El jugador {player.name} ha ganado la ronda')
+                return player
             else:
                 self.__calculateNextPlayerTurn(player)
         self.rondas -= 1
@@ -37,9 +40,7 @@ class RoundGame:
                     match accion:
                         case '':
                             letra = input('Introduce una letra: ')
-                            self.letras_introducidas.append(letra)
-                            if letra in self.phrase:
-                                player.addMoney(50)
+                            if self.guessLetter(letra):
                                 continue
                             else:
                                 return False
@@ -74,12 +75,7 @@ class RoundGame:
                         case '':
                             print('Introduce una letra: ')
                             letra = ComputerPlayer.consonanteAleatoria()
-                            if letra in self.letras_introducidas:
-                                letra = ComputerPlayer.consonanteAleatoria()
-                            else:
-                                self.letras_introducidas.append(letra)
-                            if letra in self.phrase:
-                                player.addMoney(50)
+                            if self.guessLetter(letra):
                                 continue
                             else:
                                 return False
@@ -110,8 +106,17 @@ class RoundGame:
         if self.playTurn(player):
             return True
 
-    def guessLetter(self):
-        pass
+    def guessLetter(self, letra):
+        if letra in self.letras_introducidas:
+            return False
+        else:
+            self.letras_introducidas.append(letra)
+        if letra in self.phrase:
+            #veces = count(self.phrase)
+            Player.addMoney(Constantes.RECOMPESA_LETRA)
+            return True
+        else:
+            return False
 
     def __calculateNextPlayerTurn(self, player: Player):
         index = self.players.index(player)
@@ -131,5 +136,6 @@ class RoundGame:
             introdudidas += letra + ' '
         for i in introdudidas:
             introdudidas += i + ' '
-
         print(f'{frase}  categoria: {phrase.categoria}  pista: {phrase.pista}  letras introducidas: {introdudidas}')
+
+

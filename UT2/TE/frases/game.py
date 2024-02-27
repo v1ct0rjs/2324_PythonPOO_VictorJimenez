@@ -27,7 +27,8 @@ class Game:
         frase = Phrase.getPhrase(category=categoriaName)
         round = RoundGame(self.players, frase)
         playerWinner = round.playRound()
-        playerNext = __calculateNextPlayerTurn(playerWinner)
+        playerWinner.addPrizeRound(playerWinner.priceMoneyRound)
+
 
 
         # 3. Finaliza las rondas --> Mostrar Ganador
@@ -59,24 +60,6 @@ class Game:
             if player.prizeMoney > maxPrize:
                 winner = player
                 maxPrize = player.prizeMoney
-        print(f'El ganador es {winner.name} con {winner.prizeMoney} puntos')
+        print(f'El ganador es {winner.name} con {winner.prizeMoney} €')
 
-    # def loadGame(self):
-    #     with open(os.path.expanduser('~/.ruleta_fortuna/savegame.json'), 'r') as file:
-    #         data = json.load(file)
-    #         self.jugadores = data['jugadores']
-    #         self.nombre = data['nombre']
-    #         self.tipo = data['tipo']
-    #         self.rondas = data['rondas']
-    #         self.players = data[HumanPlayer(**player) if player['tipo'] == 's' else ComputerPlayer(**player) for player in data['players']]
-    #
-    # def saveGame(self):
-    #     data = {
-    #         'jugadores': self.jugadores,
-    #         'nombre': self.nombre,
-    #         'tipo': self.tipo,
-    #         'rondas': self.rondas,
-    #         'players': [player.__dict__ for player in self.players]
-    #     }
-    #     with open(os.path.expanduser('~/.ruleta_fortuna/savegame.json'), 'w') as file:
-    #         json.dump(data, file)
+
