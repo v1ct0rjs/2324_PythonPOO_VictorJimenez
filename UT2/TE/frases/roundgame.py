@@ -16,11 +16,11 @@ class RoundGame:
         self.letras_introducidas = []
 
     def playRound(self):
-
         for player in self.players:
-            winner = self.playTurn(player)
-            if winner:
+            if self.playTurn(player):
                 return f'{player.name} ha ganado la ronda'
+            else:
+                self.__calculateNextPlayerTurn(player)
         self.rondas -= 1
         self.showInfo(self.rondas)
         if self.rondas == 0:
@@ -28,11 +28,11 @@ class RoundGame:
 
     def playTurn(self, player: Player):
         while True:
-            self.showTurnInfo(player)
-            self.__mostrarPhrase(self.phrase)
             if isinstance(player, HumanPlayer):
-                print(f'Resultado de la tirada {HumanPlayer.goMove()}')
                 while True:
+                    self.__mostrarPhrase(self.phrase)
+                    self.showTurnInfo(player)
+                    print(f'Resultado de la tirada {HumanPlayer.goMove()}')
                     accion = input('¿Que hacer ENTER - Adivinar, 1 - Solucionar, 2 - Pasar, 3 - Vocal: ')
                     match accion:
                         case '':
@@ -55,20 +55,21 @@ class RoundGame:
                         case '3':
                             vocal = input('Introduce una vocal: ')
                             if vocal in self.phrase:
-                                player.addMoney(-50)
+                                player.addMoney(-250)
                                 continue
                             else:
                                 return False
             else:
-                self.showTurnInfo(player)
                 while True:
+                    self.__mostrarPhrase(self.phrase)
+                    self.showTurnInfo(player)
+                    print(f'Resultado de la tirada {ComputerPlayer.goMove()}')
                     print('¿Que hacer ENTER - Adivinar, 1 - Solucionar, 2 - Pasar, 3 - Vocal: ')
                     accion = random.choice(['', '2', '3'])
-                    if player.prizeMoney > 50 and accion == '3':
+                    if player.prizeMoney > 250 and accion == '3':
                         accion = '3'
-                    elif player.prizeMoney < 50 and accion != '3':
+                    elif player.prizeMoney < 250 and accion != '3':
                         accion = random.choice(['', '2'])
-
                     match accion:
                         case '':
                             print('Introduce una letra: ')
@@ -105,14 +106,15 @@ class RoundGame:
     def showTurnInfo(self, player):
         return f'Es el turno de {player.name} dinero ronda: {player.prizeMoney} €'
 
-    def solvePanel(self, solucion: str):
-        pass
+    def solvePanel(self, player: Player):
+        if self.playTurn(player):
+            return True
 
     def guessLetter(self):
         pass
 
-    def __calculateNextPlayerTurn(self, playerWinner: Player):
-        index = self.players.index(playerWinner)
+    def __calculateNextPlayerTurn(self, player: Player):
+        index = self.players.index(player)
         if index == len(self.players) - 1:
             return self.players[0]
         else:
