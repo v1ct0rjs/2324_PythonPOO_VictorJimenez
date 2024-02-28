@@ -11,7 +11,7 @@ class Phrase:
         },
         {
             "categoria": "Peliculas",
-            "nombre": "El feo, el gorod y el flaco",
+            "nombre": "El feo, el gordo y el flaco",
             "pista": "Complexión corporal"
         },
         {

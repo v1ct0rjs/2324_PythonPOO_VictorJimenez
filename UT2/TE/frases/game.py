@@ -2,7 +2,7 @@ from .constantes import Constantes
 from .player import Player
 from .humanplayer import HumanPlayer
 from .computerplayer import ComputerPlayer
-#from .roundgame import RoundGame
+# from .roundgame import RoundGame
 from .frase import Phrase
 import os
 
@@ -28,13 +28,11 @@ class Game:
         categoriaName = Phrase.requestCategory()
         frase = Phrase.getPhrase(category=categoriaName)
         round = RoundGame(self.players, frase)
-        playerWinner = round.playRound()
-        playerWinner.addPrizeRound(playerWinner.priceMoneyRound)
-
-
-
+        while self.rondas > 0:
+            round.playRound()
+            self.rondas -= 1
         # 3. Finaliza las rondas --> Mostrar Ganador
-
+        self.showWinner()
 
 
     def __initGame(self):
