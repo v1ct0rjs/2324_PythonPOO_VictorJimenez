@@ -3,9 +3,10 @@ from .humanplayer import HumanPlayer
 from .computerplayer import ComputerPlayer
 from .player import Player
 from .frase import Phrase
-from .game import Game
+
 from .constantes import Constantes
 import random
+import os
 
 
 class RoundGame:
@@ -18,53 +19,67 @@ class RoundGame:
         self.letras_introducidas = []
 
     def playRound(self):
-        for player in self.players:
-            if self.playTurn(player):
-                print(f'El jugador {player.name} ha ganado la ronda')
-                return player
+        i = 0
+        while True:
+            player = self.players[i]
+            while self.playTurn(player):
+                player = self.__calculateNextPlayerTurn(player)
+            print(f'El jugador {player.name} ha ganado la ronda')
+            i = (i + 1) % len(self.players)  # Vuelve al primer jugador cuando se llega al final de la lista
+            self.rondas -= 1
+            self.showInfo(self.rondas)
+            if self.rondas == 0:
+                return max(self.players, key=lambda player: player.prizeMoney)
             else:
-                self.__calculateNextPlayerTurn(player)
-        self.rondas -= 1
-        self.showInfo(self.rondas)
-        if self.rondas == 0:
-            return Game.showWinner()
+                self.phrase = Phrase.getPhrase()
+                self.letras_introducidas = []
 
     def playTurn(self, player: Player):
         while True:
             if isinstance(player, HumanPlayer):
                 while True:
-                    self.__mostrarPhrase(self.phrase)
+                    os.system('clear')
+                    self.__mostrarPhrase(self.phrase, self.letras_introducidas)
                     self.showTurnInfo(player)
-                    print(f'Resultado de la tirada {HumanPlayer.goMove()}')
+                    print(f'Resultado de la tirada {player.goMove()}')
                     accion = input('¿Que hacer ENTER - Adivinar, 1 - Solucionar, 2 - Pasar, 3 - Vocal: ')
                     match accion:
                         case '':
                             letra = input('Introduce una letra: ')
-                            if self.guessLetter(letra):
+                            if self.guessLetter(letra, player):
+                                if self.solvePanel(player):
+                                    return True
                                 continue
                             else:
                                 return False
                         case '1':
                             solucion = input('Introduce la solucion: ')
-                            if solucion == self.phrase:
+                            if solucion == self.phrase.frase:
                                 player.addPrizeRound(player.priceMoneyRound)
                                 return True
                             else:
                                 return False
                         case '2':
-                            return False
+                            return True
                         case '3':
                             vocal = input('Introduce una vocal: ')
-                            if vocal in self.phrase:
+                            if vocal in self.phrase.frase:
                                 player.addMoney(-250)
+                                self.letras_introducidas.append(vocal)
+                                if self.solvePanel(player):
+                                    return True
                                 continue
                             else:
                                 return False
             else:
                 while True:
-                    self.__mostrarPhrase(self.phrase)
+                    os.system('clear')
+                    self.__mostrarPhrase(self.phrase, self.letras_introducidas)
                     self.showTurnInfo(player)
-                    print(f'Resultado de la tirada {ComputerPlayer.goMove()}')
+                    tirada = player.goMove()
+                    print(f'Resultado de la tirada {tirada}')
+                    if tirada == "Pierde turno":
+                        return True  # Cambia al siguiente jugador
                     print('¿Que hacer ENTER - Adivinar, 1 - Solucionar, 2 - Pasar, 3 - Vocal: ')
                     accion = random.choice(['', '2', '3'])
                     if player.prizeMoney > 250 and accion == '3':
@@ -75,12 +90,12 @@ class RoundGame:
                         case '':
                             print('Introduce una letra: ')
                             letra = ComputerPlayer.consonanteAleatoria()
-                            if self.guessLetter(letra):
+                            if self.guessLetter(letra, player):
                                 continue
                             else:
                                 return False
                         case '2':
-                            return False
+                            return True  # Cambia al siguiente jugador
                         case '3':
                             vocal = ComputerPlayer.compraVocal()
                             if vocal in self.letras_introducidas:
@@ -88,8 +103,8 @@ class RoundGame:
                             else:
                                 self.letras_introducidas.append(vocal)
 
-                            if vocal in self.phrase:
-                                player.addMoney(50)
+                            if vocal in self.phrase.frase:
+                                player.addMoney(-250)
                                 continue
                             else:
                                 return False
@@ -100,20 +115,22 @@ class RoundGame:
             print(f'{player.name} dinero ronda: {player.prizeMoney} €')
 
     def showTurnInfo(self, player):
-        return f'Es el turno de {player.name} dinero ronda: {player.prizeMoney} €'
+        print(f'Es el turno de {player.name} dinero ronda: {player.prizeMoney} €')
 
     def solvePanel(self, player: Player):
         if self.playTurn(player):
-            return True
+            if set(self.phrase.frase.lower()) <= set(self.letras_introducidas):
+                return True
+        return False
 
-    def guessLetter(self, letra):
+    def guessLetter(self, letra, player: Player):
         if letra in self.letras_introducidas:
             return False
         else:
             self.letras_introducidas.append(letra)
-        if letra in self.phrase:
+        if letra in self.phrase.frase:
             #veces = count(self.phrase)
-            Player.addMoney(Constantes.RECOMPESA_LETRA)
+            player.addMoney(Constantes.RECOMPESA_LETRA)
             return True
         else:
             return False
@@ -127,15 +144,11 @@ class RoundGame:
 
     def __mostrarPhrase(self, phrase, letras_introducidas: list[str]):
         frase = ''
-        introdudidas = ''
-        for letra in phrase:
+        introdudidas = list(set(letras_introducidas))  # Convertimos a conjunto y luego a lista para eliminar duplicados
+        for letra in phrase.frase:
             if letra.lower() in letras_introducidas:
                 frase += letra.upper()
             else:
                 frase += '_ '
-            introdudidas += letra + ' '
-        for i in introdudidas:
-            introdudidas += i + ' '
+        introdudidas = ' '.join(sorted(introdudidas))  # Convertimos la lista a una cadena
         print(f'{frase}  categoria: {phrase.categoria}  pista: {phrase.pista}  letras introducidas: {introdudidas}')
-
-

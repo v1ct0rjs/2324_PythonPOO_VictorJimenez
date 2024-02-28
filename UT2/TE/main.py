@@ -20,6 +20,7 @@ def initGame():
     juego.start()
 
 
+
 if __name__ == '__main__':
     initGame()
 

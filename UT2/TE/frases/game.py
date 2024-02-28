@@ -2,8 +2,9 @@ from .constantes import Constantes
 from .player import Player
 from .humanplayer import HumanPlayer
 from .computerplayer import ComputerPlayer
-from .roundgame import RoundGame
+#from .roundgame import RoundGame
 from .frase import Phrase
+import os
 
 
 class Game:
@@ -16,13 +17,14 @@ class Game:
         self.players: list[Player] = []
 
     def start(self):
+        from .roundgame import RoundGame
         # 1. Inicializar el juego (contruir jugadores,...)
         self.__initGame()
 
         # 2. Logica principal (Llamar a la ronda, ....)
 
         # Iterar por cada una de rondas
-
+        os.system('clear')
         categoriaName = Phrase.requestCategory()
         frase = Phrase.getPhrase(category=categoriaName)
         round = RoundGame(self.players, frase)
@@ -44,6 +46,7 @@ class Game:
 
                 """)
         input('Pulsa ENTER para comenzar el juego')
+        os.system('clear')
         self.jugadores = int(input('Indica el número de jugadores (2-4): '))
         for i in range(self.jugadores):
             nombre = input(f'Nombre del jugador {i + 1}: ')
