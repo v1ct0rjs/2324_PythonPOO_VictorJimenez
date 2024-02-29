@@ -47,10 +47,10 @@ class RoundGame:
                     tirada = player.goMove()
                     print(f'Resultado de la tirada {tirada}')
                     if tirada == "Pierde turno":
-                        return True
-                    elif tirada == "Bancarrota":
+                        return False
+                    elif tirada == "Quiebra":
                         player.applyBankrupt()
-                        return True
+                        return False
                     else:
                         accion = input('¿Que hacer ENTER - Adivinar, 1 - Solucionar, 2 - Pasar, 3 - Vocal: ')
                         match accion:
@@ -63,7 +63,15 @@ class RoundGame:
                                         return True  # Termina el turno indicando que el panel ha sido resuelto
                                     continue
                                 else:
-                                    return False
+                                    if player.priceMoney == 0:
+                                        player.prizeMoney = 0
+                                        return False
+                                    elif (player.priceMoney - tirada) < 0:
+                                        player.prizeMoney = 0
+                                        return False
+                                    else:
+                                        player.addMoney(-tirada)
+                                        return False
                             case '1':
                                 solucion = input('Introduce la solución: ')
                                 if self.__solvePanel(player, solucion):
@@ -79,15 +87,28 @@ class RoundGame:
                             case '3':
                                 vocal = input('Introduce una vocal: ')
                                 if vocal in self.phrase.frase:
-                                    player.addMoney(-250)
-                                    self.letras_introducidas.append(vocal)
-                                    if self.__isPanelSolved():
-                                        print(f'¡Felicidades! {player.name} ha completado el panel.')
+                                    if player.priceMoney >= 250:
+                                        player.addMoney(-250)
+                                        self.letras_introducidas.append(vocal)
+                                        if self.__isPanelSolved():
+                                            print(f'¡Felicidades! {player.name} ha completado el panel.')
+                                            input('Pulsa ENTER para continuar')
+                                            return True  # Termina el turno indicando que el panel ha sido resuelto
+                                        continue
+                                    else:
+                                        print('No tienes suficiente dinero para comprar una vocal')
                                         input('Pulsa ENTER para continuar')
-                                        return True  # Termina el turno indicando que el panel ha sido resuelto
-                                    continue
+                                        continue
                                 else:
-                                    return False
+                                    if player.priceMoney == 0:
+                                        player.prizeMoney = 0
+                                        return False
+                                    elif (player.priceMoney - tirada) < 0:
+                                        player.prizeMoney = 0
+                                        return False
+                                    else:
+                                        player.addMoney(-tirada)
+                                        return False
             else:
                 while True: # Jugador computadora
                     os.system('clear')
@@ -96,10 +117,10 @@ class RoundGame:
                     tirada = player.goMove()
                     print(f'Resultado de la tirada {tirada}')
                     if tirada == "Pierde turno":
-                        return True
-                    elif tirada == "Pierde turno":
+                        return False
+                    elif tirada == "Quiebra":
                         player.applyBankrupt()
-                        return True
+                        return False
                     else:
                         print('¿Que hacer ENTER - Adivinar, 1 - Solucionar, 2 - Pasar, 3 - Vocal: ')
                         time.sleep(2)
@@ -121,7 +142,15 @@ class RoundGame:
                                         return True  # Termina el turno indicando que el panel ha sido resuelto
                                     continue
                                 else:
-                                    return False
+                                    if player.prizeMoney == 0:
+                                        player.prizeMoney = 0
+                                        return False
+                                    elif (player.prizeMoney - tirada) < 0:
+                                        player.prizeMoney = 0
+                                        return False
+                                    else:
+                                        player.addMoney(-tirada)
+                                        return False
                             case '2':
                                 return False
                             case '3':
@@ -142,7 +171,15 @@ class RoundGame:
                                         return True  # Termina el turno indicando que el panel ha sido resuelto
                                     continue
                                 else:
-                                    return False
+                                    if player.priceMoney == 0:
+                                        player.prizeMoney = 0
+                                        return False
+                                    elif (player.priceMoney - tirada) < 0:
+                                        player.prizeMoney = 0
+                                        return False
+                                    else:
+                                        player.addMoney(-tirada)
+                                        return False
 
 
     def __showInfo(self, ronda):

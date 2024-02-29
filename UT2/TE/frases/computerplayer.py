@@ -10,7 +10,7 @@ class ComputerPlayer(Player): # Clase que representa al jugador computadora
         self.prizeMoney = prizeMoney
         self.priceMoneyRound = priceMoneyRound
 
-    def goMove(self):
+    def goMove(self) -> float | str:
         """ Método que simula el movimiento del jugador computadora en la ruleta de la fortuna """
         tirada = Ruleta.girar()
         if tirada == -1:
@@ -20,7 +20,8 @@ class ComputerPlayer(Player): # Clase que representa al jugador computadora
             return "Pierde turno"
         else:
             self.addMoney(tirada)
-            return f'Ha ganado {tirada} €'
+            print(f'Ha ganado {tirada} €')
+            return tirada
 
     @staticmethod
     def consonanteAleatoria():
