@@ -1,27 +1,27 @@
 import abc
+from .constantes import Constantes
 
-
-class Player:
+class Player: # Clase abstracta
     def __init__(self, name: str, prizeMoney: float, priceMoneyRound: float):
         self.name = name
         self.prizeMoney = prizeMoney
         self.priceMoneyRound = priceMoneyRound
 
-    def addMoney(self, amt: float):
+    def addMoney(self, amt: float): # Añadir dinero
         self.prizeMoney += amt
 
-    def applyBankrupt(self):
+    def applyBankrupt(self): # Aplicar quiebra
         self.priceMoneyRound = 0
 
-    def addPrizeRound(self, prize: float):
+    def addPrizeRound(self, prize: float): # Añadir premio de ronda
         self.prizeMoney += prize
 
-    def applyWinRound(self):
-        self.priceMoneyRound += self.prizeMoney
+    def applyWinRound(self): # Aplicar premio por victoria
+        self.priceMoneyRound += Constantes.RECOMPENSA_PANEL
 
     @abc.abstractmethod
-    def goMove(self):
+    def goMove(self): # Método abstracto para simular el movimiento del jugador
         pass
 
-    def __str__(self):
+    def __str__(self): # Método para imprimir el objeto
         return f'{self.name}: {self.prizeMoney}'

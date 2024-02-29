@@ -11,37 +11,44 @@ import os
 class RoundGame:
 
     def __init__(self, players: list[Player], phrase: Phrase):
-        self.players = players
-        self.phrase = phrase
-        self.rondas = Constantes.TOTAL_ROUNDS
-        self.letras_introducidas = []
+        self.players = players # Lista de jugadores
+        self.phrase = phrase # Frase a adivinar
+        self.rondas = Constantes.TOTAL_ROUNDS # Número de rondas
+        self.letras_introducidas = [] # Letras introducidas
+        self.current_player = self.players[0]  # Jugador actual
 
     def playRound(self):
-        while True:
-            player = self.players[0]
-            while not self.playTurn(player):
-                player = self.__calculateNextPlayerTurn(player)
-            os.system('clear')
-            print(f'El jugador {player.name} ha ganado la ronda')
-            player.addPrizeRound(Constantes.RECOMPENSA_PANEL)
-            self.showInfo(self.rondas)
-            self.phrase = Phrase.getPhrase()
-            self.letras_introducidas = []
-            return self.players
-
+        """Jugar una ronda"""
+        # La ronda continúa hasta que se resuelva la frase
+        while not self.__isPhraseSolved():
+            # Iterar por cada uno de los jugadores
+            for player in self.players:
+                if self.playTurn(player): # Si el turno ha terminado
+                    if self.__isPhraseSolved(): # Si la frase ha sido resuelta
+                        os.system('clear')
+                        print(f'El jugador {player.name} ha ganado la ronda')
+                        player.applyWinRound() # Aplicar premio por victoria
+                        self.__showInfo(self.rondas)
+                        self.letras_introducidas = []
+                        input('Pulsa ENTER para continuar')
+                        os.system('clear')
+                        return True # Termina la ronda
+                player = self.__calculateNextPlayerTurn(player) # Calcular el siguiente jugador
+        return False
 
     def playTurn(self, player: Player):
+        """Jugar un turno"""
         while True:
             if isinstance(player, HumanPlayer):
                 while True:
                     os.system('clear')
                     self.__mostrarPhrase(self.phrase, self.letras_introducidas)
-                    self.showTurnInfo(player)
+                    self.__showTurnInfo(player)
                     tirada = player.goMove()
                     print(f'Resultado de la tirada {tirada}')
                     if tirada == "Pierde turno":
                         return True
-                    elif tirada == "Pierde turno":
+                    elif tirada == "Bancarrota":
                         player.applyBankrupt()
                         return True
                     else:
@@ -49,19 +56,24 @@ class RoundGame:
                         match accion:
                             case '':
                                 letra = input('Introduce una letra: ')
-                                if self.guessLetter(letra, player):
-                                    if self.solvePanel(player):
-                                        return True
+                                if self.__guessLetter(letra, player):
+                                    if self.__isPanelSolved():
+                                        print(f'¡Felicidades! {player.name} ha completado el panel.')
+                                        input('Pulsa ENTER para continuar')
+                                        return True  # Termina el turno indicando que el panel ha sido resuelto
                                     continue
                                 else:
                                     return False
                             case '1':
-                                solucion = input('Introduce la solucion: ')
-                                if solucion == self.phrase.frase:
-                                    player.addPrizeRound(player.priceMoneyRound)
-                                    return True
+                                solucion = input('Introduce la solución: ')
+                                if self.__solvePanel(player, solucion):
+                                    print(f'¡Correcto! {player.name} ha resuelto el panel.')
+                                    input('Pulsa ENTER para continuar')
+                                    return True  # Finaliza el turno indicando que el panel ha sido resuelto
                                 else:
-                                    return False
+                                    print('Incorrecto. No se resuelve el panel.')
+                                    input('Pulsa ENTER para continuar')
+                                    return False  # El panel no se resuelve, el turno continúa
                             case '2':
                                 return False
                             case '3':
@@ -69,16 +81,18 @@ class RoundGame:
                                 if vocal in self.phrase.frase:
                                     player.addMoney(-250)
                                     self.letras_introducidas.append(vocal)
-                                    if self.solvePanel(player):
-                                        return True
+                                    if self.__isPanelSolved():
+                                        print(f'¡Felicidades! {player.name} ha completado el panel.')
+                                        input('Pulsa ENTER para continuar')
+                                        return True  # Termina el turno indicando que el panel ha sido resuelto
                                     continue
                                 else:
                                     return False
             else:
-                while True:
+                while True: # Jugador computadora
                     os.system('clear')
                     self.__mostrarPhrase(self.phrase, self.letras_introducidas)
-                    self.showTurnInfo(player)
+                    self.__showTurnInfo(player)
                     tirada = player.goMove()
                     print(f'Resultado de la tirada {tirada}')
                     if tirada == "Pierde turno":
@@ -96,70 +110,129 @@ class RoundGame:
                             accion = random.choice(['', '2'])
                         match accion:
                             case '':
-                                print('Introduce una letra: ')
-                                time.sleep(2)
                                 letra = ComputerPlayer.consonanteAleatoria()
-                                if self.guessLetter(letra, player):
+                                time.sleep(1)
+                                print(f'Introduce una letra: {letra}')
+                                time.sleep(2)
+                                if self.__guessLetter(letra, player):
+                                    if self.__isPanelSolved():
+                                        print(f'¡Felicidades! {player.name} ha completado el panel.')
+                                        input('Pulsa ENTER para continuar')
+                                        return True  # Termina el turno indicando que el panel ha sido resuelto
                                     continue
                                 else:
                                     return False
                             case '2':
                                 return False
                             case '3':
-                                time.sleep(2)
                                 vocal = ComputerPlayer.compraVocal()
+                                time.sleep(1)
+                                print(f'Introduce una vocal: {vocal}')
+                                time.sleep(2)
                                 if vocal in self.letras_introducidas:
                                     vocal = ComputerPlayer.compraVocal()
                                 else:
                                     self.letras_introducidas.append(vocal)
-
                                 if vocal in self.phrase.frase:
                                     player.addMoney(-250)
+                                    self.letras_introducidas.append(vocal)
+                                    if self.__isPanelSolved():
+                                        print(f'¡Felicidades! {player.name} ha completado el panel.')
+                                        input('Pulsa ENTER para continuar')
+                                        return True  # Termina el turno indicando que el panel ha sido resuelto
                                     continue
                                 else:
                                     return False
 
-    def showInfo(self, ronda):
-        print(f'Ronda {ronda}')
+
+    def __showInfo(self, ronda):
+        """Mostrar información de la ronda"""
+        i = 1
+        print(f'Ronda {i} de {ronda}')
         for player in self.players:
             print(f'{player.name} dinero ronda: {player.prizeMoney} €')
+        i += 1
 
-    def showTurnInfo(self, player):
-        print(f'Es el turno de {player.name} dinero ronda: {player.prizeMoney} €')
+    def __showTurnInfo(self, player):
+        """Mostrar información del turno"""
+        print(f'''
+        Es el turno de {player.name}
+        =================================== 
+        Dinero ronda {player.name}: {player.prizeMoney} €
+        ''')
 
-    def solvePanel(self, player: Player):
-        if self.playTurn(player):
-            if set(self.phrase.frase.lower()) <= set(self.letras_introducidas):
-                return False
-        return True
+    def __solvePanel(self, player: Player, solucion: str):
+        """Resolver la frase"""
+        if solucion.lower() == self.phrase.frase.lower(): # Comprobar si la solución es correcta
+            for letra in set(self.phrase.frase.lower()):
+                if letra.isalpha():   # Añadir todas las letras de la frase a las introducidas
+                    self.letras_introducidas.append(letra)
+            player.addPrizeRound(player.prizeMoney)  # Asumiendo que prizeMoney es el premio acumulado
+            return True  # La frase ha sido resuelta correctamente
+        else:
+            return False  # La frase no ha sido resuelta
 
-
-    def guessLetter(self, letra, player: Player):
-        if letra in self.letras_introducidas:
+    def __guessLetter(self, letra, player: Player):
+        """Adivinar una letra de la frase"""
+        if letra in self.letras_introducidas: # Comprobar si la letra ya ha sido introducida
             return False
         else:
-            self.letras_introducidas.append(letra)
-        if letra in self.phrase.frase:
-            # veces = count(self.phrase)
-            player.addMoney(Constantes.RECOMPESA_LETRA)
+            self.letras_introducidas.append(letra) # Añadir la letra a las introducidas
+        if letra in self.phrase.frase: # Comprobar si la letra está en la frase
+            veces = self.phrase.frase.count(letra)
+            player.addMoney(Constantes.RECOMPENSA_LETRA * veces) # Asumiendo que prizeMoney es el premio acumulado
             return True
         else:
             return False
 
     def __calculateNextPlayerTurn(self, player: Player):
-        index = self.players.index(player)
-        if index == len(self.players) - 1:
-            return self.players[0]
+        """Calcular el siguiente jugador después de cada turno"""
+        index = self.players.index(player) # Obtener el índice del jugador actual
+        if index == len(self.players) - 1: # Si el jugador actual es el último de la lista
+            return self.players[0]  # Devolver el primer jugador
         else:
-            return self.players[index + 1]
+            return self.players[index + 1] # Devolver el siguiente jugador
 
     def __mostrarPhrase(self, phrase, letras_introducidas: list[str]):
+        """Mostrar la frase con las letras introducidas"""
+        print("""
+        
+        ============================================== LA RULETA DE LA FORTUNA =================================
+                                                                                                           
+        """)
+        self.__showInfo(self.rondas) # Mostrar información de la ronda
         frase = ''
         introdudidas = list(set(letras_introducidas))  # Convertimos a conjunto y luego a lista para eliminar duplicados
         for letra in phrase.frase:
-            if letra.lower() in letras_introducidas:
+            if letra.lower() in [l.lower() for l in letras_introducidas]:
                 frase += letra.upper()
+            elif letra == ' ':
+                frase += ' '
             else:
                 frase += '_ '
         introdudidas = ' '.join(sorted(introdudidas))  # Convertimos la lista a una cadena
-        print(f'{frase}  categoria: {phrase.categoria}  pista: {phrase.pista}  letras introducidas: {introdudidas}')
+        print(f'''
+        +---------------------------------------------------------------------------------------------------+
+                                                                                                           
+           {" " * ((100 - len(frase)) // 2)}{frase}{" " * ((100 - len(frase)) // 2)} 
+                                                                                                                                                                                               
+                                                                                                           
+           Categoria: {phrase.categoria}
+           Pista: {phrase.pista}
+           Letras introducidas: {introdudidas}
+                                                                                                           
+        +---------------------------------------------------------------------------------------------------+
+        ''') # Mostrar la frase con las letras introducidas
+
+    def __isPhraseSolved(self):
+        """Verificar si todas las letras de la frase están en las letras introducidas"""
+        normalized_phrase = [letter.lower() for letter in self.phrase.frase if letter.isalpha()]
+        normalized_introducidas = [letter.lower() for letter in self.letras_introducidas]
+        return set(normalized_phrase).issubset(set(normalized_introducidas)) # Comprobar si todas las letras de la frase están en las introducidas
+
+
+    def __isPanelSolved(self):
+        """Verificar si todas las letras de la frase están en las letras introducidas"""
+        normalized_phrase = set(letter.lower() for letter in self.phrase.frase if letter.isalpha()) # Convertir a conjunto para eliminar duplicados
+        normalized_introducidas = set(letter.lower() for letter in self.letras_introducidas)
+        return normalized_phrase.issubset(normalized_introducidas)  # Comprobar si todas las letras de la frase están en las introducidas
