@@ -225,8 +225,10 @@ class RoundGame:
                     self.__showTurnInfo(player)
                     tirada = player.goMove()
                     if tirada == "Pierde turno":
+                        input('Pulsa ENTER para continuar')
                         return False
                     elif tirada == "Quiebra":
+                        input('Pulsa ENTER para continuar')
                         player.applyBankrupt()
                         return False
                     else:
