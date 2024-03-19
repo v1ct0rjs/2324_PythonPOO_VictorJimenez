@@ -5,6 +5,8 @@ from .computerplayer import ComputerPlayer
 from .duoPlayer import DuoPlayer
 from .frase import Phrase
 import os
+import json
+import csv
 
 
 
@@ -34,8 +36,10 @@ class Game:
             roundResult = round.playRound() # Llamar a la ronda
             if roundResult:  # Si playRound retorna True, se decrementan las rondas
                 self.rondas -= 1
+                self.__saveGame()
         # 3. Finalizan las rondas --> Mostrar Ganador
         self.showWinner()
+
 
     def __initGame(self):
         """ Método que inicializa el juego """
@@ -91,7 +95,7 @@ class Game:
         print('''
         Gracias por jugar a la Ruleta de la Fortuna
         ''')
-        print('Pulse ENTER para salir')
+        print('Pulse ENTER para continuar...')
         input()
 
 
@@ -132,4 +136,42 @@ class Game:
         except FileNotFoundError as e:
             print('No se ha encontrado ninguna partida guardada', e)
 
-
+    def __saveGame(self):
+        """ Método que guarda la partida actual """
+        while True:
+            try:
+                os.system('clear')
+                opcion = input("¿Desea guardar la partida actual? (s/n): ")
+                match opcion.lower():
+                    case 's':
+                        save_dir = os.path.expanduser('~/.ruleta_fortuna')
+                        if not os.path.exists(save_dir):
+                            os.makedirs(save_dir)
+                        save_file = os.path.join(save_dir, f'{Constantes.PARTIDA_SAVE_FILENAME}.{Constantes.PARTIDA_SAVE_FORMAT}')
+                        with open(save_file, 'w') as file:
+                            if Constantes.PARTIDA_SAVE_FORMAT == 'json':
+                                game_state = {
+                                    "rondas": self.rondas,
+                                    "players": [
+                                        {
+                                            "name": player.name,
+                                            "prizeMoney": player.prizeMoney,
+                                            "priceMoneyRound": player.priceMoneyRound
+                                        } for player in self.players
+                                    ]
+                                }
+                                json.dump(game_state, file)
+                                return None
+                            else:
+                                writer = csv.writer(file)
+                                for player in self.players:
+                                    player_data = [player.name, player.prizeMoney, player.priceMoneyRound]
+                                    writer.writerow(player_data)
+                                writer.writerow([self.rondas])
+                                return None
+                    case 'n':
+                        break
+                    case _:
+                        raise TypeError
+            except TypeError:
+                print('No se reconoce el caracter')
