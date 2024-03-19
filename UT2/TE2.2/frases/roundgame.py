@@ -445,3 +445,7 @@ class RoundGame:
                             else:
                                 player.addMoney(-tirada)
                                 return False
+
+    def FromSavedRound(self):
+        with open(f'~/.ruleta_fortuna/{Constantes.PARTIDA_SAVE_FILENAME}.{Constantes.PARTIDA_SAVE_FORMAT}') as file:
+            pass

@@ -33,3 +33,7 @@ class ComputerPlayer(Player): # Clase que representa al jugador computadora
         """ Método que simula la compra de una vocal """
         vocal = random.choice("aeiou")
         return vocal
+
+    def FromSavedPlayer(self):
+        with open(f'~/.ruleta_fortuna/{Constantes.PARTIDA_SAVE_FILENAME}.{Constantes.PARTIDA_SAVE_FORMAT}') as file:
+            pass

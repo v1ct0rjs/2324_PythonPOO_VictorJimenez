@@ -158,16 +158,14 @@ class RoundGame:
         """Verificar si todas las letras de la frase están en las letras introducidas"""
         normalized_phrase = [letter.lower() for letter in self.phrase.frase if letter.isalpha()]
         normalized_introducidas = [letter.lower() for letter in self.letras_introducidas]
-        return set(normalized_phrase).issubset(
-            set(normalized_introducidas))  # Comprobar si todas las letras de la frase están en las introducidas
+        return set(normalized_phrase).issubset(set(normalized_introducidas))  # Comprobar si todas las letras de la frase están en las introducidas
 
     def __isPanelSolved(self):
         """Verificar si todas las letras de la frase están en las letras introducidas"""
         normalized_phrase = set(letter.lower() for letter in self.phrase.frase if
                                 letter.isalpha())  # Convertir a conjunto para eliminar duplicados
         normalized_introducidas = set(letter.lower() for letter in self.letras_introducidas)
-        return normalized_phrase.issubset(
-            normalized_introducidas)  # Comprobar si todas las letras de la frase están en las introducidas
+        return normalized_phrase.issubset(normalized_introducidas)  # Comprobar si todas las letras de la frase están en las introducidas
 
     def __juegaHumano(self, player):
         while True:

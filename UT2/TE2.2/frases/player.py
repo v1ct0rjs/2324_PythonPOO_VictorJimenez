@@ -25,3 +25,7 @@ class Player: # Clase abstracta
 
     def __str__(self): # Método para imprimir el objeto
         return f'{self.name}: {self.prizeMoney}'
+
+    @abc.abstractmethod
+    def FromSavedPlayer(self):
+        pass

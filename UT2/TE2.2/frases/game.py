@@ -95,4 +95,41 @@ class Game:
         input()
 
 
+    def __loadGame(self):
+        """ Método que comprueba si existe una partida guardada """
+        while True:
+            try:
+                valor = input('¿Desea cargar una partida existente o craar una nueva? (s/n): ').lower()
+                if valor == 's':
+                    pass
+                elif valor == 'n':
+                    return False
+                    pass
+                else:
+                    raise TypeError
+            except TypeError:
+                print('No se reconoce el caracter')
+
+
+    def __loadGameCSV(self):
+        """ Método que carga una partida guardada en formato CSV """
+        try:
+            if os.path.exists('~/.ruleta_fortuna/savegame.json'):
+                pass
+            else:
+                raise FileNotFoundError
+        except FileNotFoundError as e:
+            print('No se ha encontrado ninguna partida guardada', e)
+
+
+    def __loadGameJSON(self):
+        """ Método que carga una partida guardada en formato JSON """
+        try:
+            if os.path.exists('~/.ruleta_fortuna/savegame.cvs'):
+                pass
+            else:
+                raise FileNotFoundError
+        except FileNotFoundError as e:
+            print('No se ha encontrado ninguna partida guardada', e)
+
 

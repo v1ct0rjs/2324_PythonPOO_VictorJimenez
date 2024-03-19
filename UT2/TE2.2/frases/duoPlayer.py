@@ -25,3 +25,7 @@ class DuoPlayer(Player):  # Clase que representa al jugador humano
 
     def __str__(self):
         return f'Equipo {self.name}: {self.jugadores} con {self.prizeMoney} €'
+
+    def FromSavedPlayer(self):
+        with open(f'~/.ruleta_fortuna/{Constantes.PARTIDA_SAVE_FILENAME}.{Constantes.PARTIDA_SAVE_FORMAT}') as file:
+            pass

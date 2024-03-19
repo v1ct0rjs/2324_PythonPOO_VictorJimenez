@@ -6,3 +6,4 @@ class Constantes:  # Clase con constantes
     VOCAL_PRECIO = 250
     RECOMPENSA_PANEL = 500
     RECOMPENSA_LETRA = 100
+    

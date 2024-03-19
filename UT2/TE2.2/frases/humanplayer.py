@@ -1,6 +1,6 @@
 from .player import Player
 from .ruleta import Ruleta
-
+from .constantes import Constantes
 
 class HumanPlayer(Player):  # Clase que representa al jugador humano
     def __init__(self, name: str, prizeMoney: float, priceMoneyRound: float):
@@ -21,3 +21,7 @@ class HumanPlayer(Player):  # Clase que representa al jugador humano
             self.addMoney(tirada)
             print(f'Ha ganado {tirada} €')
             return tirada
+
+    def FromSavedPlayer(self):
+        with open(f'~/.ruleta_fortuna/{Constantes.PARTIDA_SAVE_FILENAME}.{Constantes.PARTIDA_SAVE_FORMAT}') as file:
+            pass
